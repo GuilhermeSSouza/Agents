@@ -5,6 +5,8 @@ MAS agent {
 	environment: AmbGraf
 
 	agents:
+		bomb;
+		policia;
 		piro; 
 		walker;
 

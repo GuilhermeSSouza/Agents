@@ -113,11 +113,14 @@ public class AmbGraf extends Environment {
 				setAgPos(0, 0, 0);
 
 				Location piro = new Location(gridSize / 2, gridSize / 2);
-				Location piro = new Location(2, 5);
+				Location pL = new Location(2, 5);
+				Location bomb = new Location (7,3);
 
 				setAgPos(1, piro);
 				
+				setAgPos(2,pL);
 				
+				setAgPos(3, bomb);
 				
 
 			} catch (Exception e) {
@@ -164,6 +167,39 @@ public class AmbGraf extends Environment {
 			
 			setAgPos(1, pL);
 		}
+		
+		
+		/**
+		 * Ir ate onde o piro foi visto.
+		 * @param x
+		 * @param y
+		 */
+		void andaPolice(int x, int y) {
+			
+			Location poliLoc = getAgPos(2);
+			setAgPos(2,  new Location(x, poliLoc.y));
+			Location poliLoc2 = getAgPos(2);
+			setAgPos(2,  new Location(poliLoc2.x, y));
+			
+		}
+		
+		
+		/**
+		 * Ir ate o incedio.
+		 * @param x
+		 * @param y
+		 */
+		void andaBomb(int x, int y) {
+			
+			Location bombLoc = getAgPos(3);
+			setAgPos(2,  new Location(x, bombLoc.y));
+			Location bombLoc2 = getAgPos(2);
+			setAgPos(2,  new Location(bombLoc2.x, y));
+			
+		}
+		
+		
+		
 	}
 
 	class VisaoAmbGraf extends GridWorldView implements Serializable {
@@ -220,7 +256,25 @@ public class AmbGraf extends Environment {
 				super.drawString(g, x, y, defaultFont, label);
 				setVisible(true);
 			}
+			if (id == 2) {
+
+				String label = "Police";
+				c = Color.YELLOW;
+				super.drawAgent(g, x, y, c, -1);
+				g.setColor(Color.black);
+				super.drawString(g, x, y, defaultFont, label);
+				setVisible(true);
+			}
 			
+			if (id == 3) {
+
+				String label = "Bomb";
+				c = Color.ORANGE;
+				super.drawAgent(g, x, y, c, -1);
+				g.setColor(Color.black);
+				super.drawString(g, x, y, defaultFont, label);
+				setVisible(true);
+			}
 		}
 
 	}
