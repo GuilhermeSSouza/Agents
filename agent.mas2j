@@ -1,0 +1,13 @@
+MAS agent {
+
+	infrastructure: Centralised
+
+	environment: AmbGraf
+
+	agents:
+		piro; 
+		walker;
+
+	aslSourcePath:
+		"src/asl";
+}
