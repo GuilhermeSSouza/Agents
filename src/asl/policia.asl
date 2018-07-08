@@ -1,11 +1,8 @@
-// Agent policia in project agent
 
-/* Initial beliefs and rules */
++pos(X) : true
+	<- 	!mover.
+	
++!mover : true
+	<- 	.wait (500).
+		
 
-/* Initial goals */
-
-!start.
-
-/* Plans */
-
-+!start : true <- .print("hello world.").

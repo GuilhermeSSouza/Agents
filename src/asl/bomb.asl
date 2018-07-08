@@ -2,10 +2,23 @@
 
 /* Initial beliefs and rules */
 
-/* Initial goals */
 
-!start.
 
-/* Plans */
-
-+!start : true <- .print("hello world.").
+/* Initial goals*/ 
++apaga(X)
+	[source(walker)]:true
+	<- !apagarFogo.
+		
+		
++!apagarFogo:true
+	<- .wait(300);
+	   apFogo.
+	
+	
++pos(X) : true
+	<- 	!mover.
+	
++!mover : true
+	<- 	.wait (500);
+		andaBomb.
+	

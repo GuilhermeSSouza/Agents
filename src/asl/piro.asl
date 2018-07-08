@@ -1,14 +1,9 @@
 // Agent piro in project grafico
 
-+pos(L, X, Y) : true
-	<- 	!mover (X, Y).
++pos(X) : true
+	<- 	!mover.
 	
-+!mover (X, Y) : X < 9
-	<- 	.wait (3000);
++!mover : true
+	<- 	.wait (500);
 		andaPiro.
 
-+!mover (X, Y) : X == 9 & Y < 9
-	<- 	.wait (3000);
-		andaPiro.
-
-+!mover (X, Y) : true.

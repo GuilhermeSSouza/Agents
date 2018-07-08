@@ -24,8 +24,15 @@ public class AmbGraf extends Environment {
 	 * Crenças iniais dos agentes
 	 */
 	public static final Literal civil = Literal.parseLiteral("proximaCasa");
+	/*public static final Literal civilFogo = Literal.parseLiteral("apFogo");*/
 	public static final Term piro = Literal.parseLiteral("andaPiro");
+	public static final Literal bombeiro = Literal.parseLiteral("apFogo");
+	public static final Literal chamar = Literal.parseLiteral("chamarBomb");
 
+	private int contapiro = 0;
+	private int contaBomb = 0;
+	private int contaPoli = 0;
+	
 	private Logger logger = Logger.getLogger("graficTest." + AmbGraf.class.getName());
 
 	private ModeloAmbGraf model;
@@ -53,12 +60,16 @@ public class AmbGraf extends Environment {
 		try {
 
 			if (action.equals(civil)) {
+				
 				model.proximaCasa();
-			} else if (action.equals(piro)) {						
+								
+			} else if (action.equals(piro)) {					
 				
 				model.andaPiro();
-			} else {
-				return false;
+				
+			} else if (action.equals(bombeiro)){
+				
+				model.apFogo();
 			}
 
 		} catch (Exception e) {
@@ -94,7 +105,9 @@ public class AmbGraf extends Environment {
 		
 
 		Literal pos1 = Literal.parseLiteral("pos(walker," + walkerLoc.x + "," + walkerLoc.y + ")");
-		Literal pos2 = Literal.parseLiteral("pos(piro," + piroLoc.x + "," + piroLoc.y + ")");
+		Literal pos2 = Literal.parseLiteral("pos(" + contapiro +")");
+		
+//				+ "piro," + piroLoc.x + "," + piroLoc.y + ")");
 		Literal pos3 = Literal.parseLiteral("pos(policia," + poliLoc.x + "," + poliLoc.y + ")");
 		Literal pos4 = Literal.parseLiteral("pos(bombeiro," + bombLoc.x + "," + bombLoc.y + ")");
 
@@ -102,6 +115,13 @@ public class AmbGraf extends Environment {
 		addPercept(pos2);
 		addPercept(pos3);
 		addPercept(pos4);
+		
+		if(model.hasObject(randFire, walkerLoc)){
+			Literal fogo = Literal.parseLiteral("fogo(civil," + walkerLoc.x + "," + walkerLoc.y + ")");
+			addPercept(fogo);
+		
+		}	
+		
 	}
 
 	class ModeloAmbGraf extends GridWorldModel {
@@ -128,7 +148,7 @@ public class AmbGraf extends Environment {
 			}
 		}
 
-		void proximaCasa() throws Exception {
+		void proximaCasa()  {
 
 			Location walkerLoc = getAgPos(0);
 
@@ -145,6 +165,8 @@ public class AmbGraf extends Environment {
 			}
 
 			setAgPos(0, walkerLoc);
+			Literal pos1 = Literal.parseLiteral("pos(walker," + walkerLoc.x + "," + walkerLoc.y + ")");
+			addPercept(pos1);
 			
 		}
 
@@ -164,8 +186,21 @@ public class AmbGraf extends Environment {
 			}else if(pL.y>y) {
 				pL.y--;
 			}
+			if(randFire <= r.nextInt(100)) {	
+				if(!model.hasObject(randFire, pL))
+				add (randFire, pL.x,pL.y);
+			}else {
+				
+			}
+			
+			
 			
 			setAgPos(1, pL);
+			contapiro ++;
+			Literal pos2 = Literal.parseLiteral("pos(" + contapiro +")");
+			System.out.println ("\nPos2 = " + pos2 +"\n");
+			addPercept(pos2);
+			
 		}
 		
 		
@@ -185,16 +220,54 @@ public class AmbGraf extends Environment {
 		
 		
 		/**
-		 * Ir ate o incedio.
+		 * Ir ate o incendio.
 		 * @param x
 		 * @param y
 		 */
-		void andaBomb(int x, int y) {
+				
+		void apFogo() {
 			
-			Location bombLoc = getAgPos(3);
-			setAgPos(2,  new Location(x, bombLoc.y));
-			Location bombLoc2 = getAgPos(2);
-			setAgPos(2,  new Location(bombLoc2.x, y));
+			contaBomb++;
+			Literal posiFogo = Literal.parseLiteral("apaga(" + contaBomb +")");
+			/*System.out.println ("\n RECEBI O CHAMADO = " + posiFogo +"\n");*/
+			addPercept(posiFogo);
+			Location bombFogoLoc = model.getAgPos(0);
+			
+			
+			setAgPos(3, bombFogoLoc);
+							
+			remove(randFire, bombFogoLoc);
+			
+		}
+		
+		void andaBomb() {
+			Random r = new Random();
+			Location pL = getAgPos(3);
+			int x = r.nextInt(10);
+			int y = r.nextInt(10);
+			if(pL.x<x) {
+				pL.x++;
+			}else if (pL.x>x) {
+				pL.x--;
+			}
+			
+			if(pL.y<y) {
+				pL.y++;
+			}else if(pL.y>y) {
+				pL.y--;
+			}
+			if(randFire <= r.nextInt(100)) {
+				if(!model.hasObject(randFire, pL))
+				add (randFire, pL.x,pL.y);
+			}else {}
+			
+			
+			
+			setAgPos(3, pL);
+			contaBomb ++;
+			Literal pos5 = Literal.parseLiteral("pos(" + contaBomb +")");
+			System.out.println ("\nPos2 = " + pos5 +"\n");
+			addPercept(pos5);
 			
 		}
 		
@@ -240,7 +313,7 @@ public class AmbGraf extends Environment {
 			if (id == 0) {
 
 				String label = "Walker";
-				c = Color.BLUE;
+				c = Color.LIGHT_GRAY;
 				super.drawAgent(g, x, y, c, -1);
 				g.setColor(Color.black);
 				super.drawString(g, x, y, defaultFont, label);
@@ -259,7 +332,7 @@ public class AmbGraf extends Environment {
 			if (id == 2) {
 
 				String label = "Police";
-				c = Color.YELLOW;
+				c = Color.BLUE;
 				super.drawAgent(g, x, y, c, -1);
 				g.setColor(Color.black);
 				super.drawString(g, x, y, defaultFont, label);
