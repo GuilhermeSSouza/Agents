@@ -1,6 +1,6 @@
 // Agent walker in project graficTest
 
-+pos(L, X, Y) : true
++local(L, X, Y) : true
 	<- 	!mover (X, Y).
 	
 
