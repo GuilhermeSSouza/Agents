@@ -1,5 +1,5 @@
 
-+pos(X) : true
++police(X) : true
 	<- 	!mover.
 	
 +!mover : true

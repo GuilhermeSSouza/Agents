@@ -8,16 +8,16 @@
 /* Initial goals*/ 
 +apaga[source(walker)] : true
 	<- 	.print ("CHAMANDO OBJETIVO APAGAR FOGO");
-		!apagarFogo.
+		!temFogo.
 		
 		
-+!apagarFogo:true
++!temFogo:true
 	<- .wait(300);
 		.print("APAGANDO INCENDIO !!!!!");
 		apFogo.
 	
 	
-//+pos(X) : true
+//+bombeiro(X) : true
 //	<- 	!mover.
 	
 //+!mover : true

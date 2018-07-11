@@ -105,16 +105,16 @@ public class AmbGraf extends Environment {
 		
 
 		Literal pos1 = Literal.parseLiteral("pos(walker," + walkerLoc.x + "," + walkerLoc.y + ")");
-		Literal pos2 = Literal.parseLiteral("pos(" + contapiro +")");
+		Literal pos2 = Literal.parseLiteral("incendio(" + contapiro +")");
 		
 //				+ "piro," + piroLoc.x + "," + piroLoc.y + ")");
-		Literal pos3 = Literal.parseLiteral("pos(policia," + poliLoc.x + "," + poliLoc.y + ")");
-		Literal pos4 = Literal.parseLiteral("pos(bombeiro," + bombLoc.x + "," + bombLoc.y + ")");
+		//Literal pos3 = Literal.parseLiteral("police(" + contaPoli + ")");
+		//Literal pos4 = Literal.parseLiteral("bombeiro("+ contaBomb + ")");
 
 		addPercept(pos1);
 		addPercept(pos2);
-		addPercept(pos3);
-		addPercept(pos4);
+		//addPercept(pos3);
+		//addPercept(pos4);
 		
 		
 	}
