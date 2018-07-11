@@ -1,20 +1,24 @@
 // Agent walker in project graficTest
 
-
-
-
-!chamar.
-
-
-+!chamar:true 
-	<-.send(bomb, tell, apaga).
-
-+fogo(L, X, Y) : true
-	<- .wait(300);
-	 !chamar.
-	
 +pos(L, X, Y) : true
 	<- 	!mover (X, Y).
+	
+
++fogo(X) : true 
+	<-	.print ("CHAMANDO BOMBEIRO");
+		.send(bomb, achieve, apaga).
+
+
+//+fogo(X) : true
+//	<- .wait(300);
+//	 .print ("CHAMA O BOMBEIRO!");
+//	 !chamar.	
+	
+	
+//+!chamar:true 
+//	<-	.print ("chamando bombeiro");
+//		.send(bomb, achieve, apaga).
+	
 
 +!mover (X, Y) : X < 9
 	<- 	.wait (300);

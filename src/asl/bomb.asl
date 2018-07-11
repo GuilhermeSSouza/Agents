@@ -4,21 +4,23 @@
 
 
 
+
 /* Initial goals*/ 
-+apaga(X)
-	[source(walker)]:true
-	<- !apagarFogo.
++apaga[source(walker)] : true
+	<- 	.print ("CHAMANDO OBJETIVO APAGAR FOGO");
+		!apagarFogo.
 		
 		
 +!apagarFogo:true
 	<- .wait(300);
-	   apFogo.
+		.print("APAGANDO INCENDIO !!!!!");
+		apFogo.
 	
 	
-+pos(X) : true
-	<- 	!mover.
+//+pos(X) : true
+//	<- 	!mover.
 	
-+!mover : true
-	<- 	.wait (500);
-		andaBomb.
+//+!mover : true
+//	<- 	.wait (500);
+//		andaBomb.
 	

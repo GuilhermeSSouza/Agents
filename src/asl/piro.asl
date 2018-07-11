@@ -1,6 +1,6 @@
 // Agent piro in project grafico
 
-+pos(X) : true
++incendio(X) : true
 	<- 	!mover.
 	
 +!mover : true

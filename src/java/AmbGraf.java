@@ -27,7 +27,7 @@ public class AmbGraf extends Environment {
 	/*public static final Literal civilFogo = Literal.parseLiteral("apFogo");*/
 	public static final Term piro = Literal.parseLiteral("andaPiro");
 	public static final Literal bombeiro = Literal.parseLiteral("apFogo");
-	public static final Literal chamar = Literal.parseLiteral("chamarBomb");
+	
 
 	private int contapiro = 0;
 	private int contaBomb = 0;
@@ -116,11 +116,6 @@ public class AmbGraf extends Environment {
 		addPercept(pos3);
 		addPercept(pos4);
 		
-		if(model.hasObject(randFire, walkerLoc)){
-			Literal fogo = Literal.parseLiteral("fogo(civil," + walkerLoc.x + "," + walkerLoc.y + ")");
-			addPercept(fogo);
-		
-		}	
 		
 	}
 
@@ -164,9 +159,25 @@ public class AmbGraf extends Environment {
 				walkerLoc.y=0;
 			}
 
-			setAgPos(0, walkerLoc);
-			Literal pos1 = Literal.parseLiteral("pos(walker," + walkerLoc.x + "," + walkerLoc.y + ")");
-			addPercept(pos1);
+			if(!model.hasObject(randFire, walkerLoc)){
+							
+				setAgPos(0, walkerLoc);
+				Literal pos1 = Literal.parseLiteral("pos(walker," + walkerLoc.x + "," + walkerLoc.y + ")");
+				addPercept(pos1);
+			
+			}else {
+				clearPercepts();
+				contaBomb+=5;
+				System.out.println("\nBombeiro chamado\n");
+
+				
+				System.out.println("f(" + contaBomb + ")");
+			Literal fogo = Literal.parseLiteral("fogo(" + contaBomb + ")");
+			addPercept(fogo);
+			}
+			
+			
+			
 			
 		}
 
@@ -175,6 +186,8 @@ public class AmbGraf extends Environment {
 			Location pL = getAgPos(1);
 			int x = r.nextInt(10);
 			int y = r.nextInt(10);
+			
+			
 			if(pL.x<x) {
 				pL.x++;
 			}else if (pL.x>x) {
@@ -225,14 +238,11 @@ public class AmbGraf extends Environment {
 		 * @param y
 		 */
 				
-		void apFogo() {
+		void apFogo() {			
 			
-			contaBomb++;
-			Literal posiFogo = Literal.parseLiteral("apaga(" + contaBomb +")");
-			/*System.out.println ("\n RECEBI O CHAMADO = " + posiFogo +"\n");*/
-			addPercept(posiFogo);
-			Location bombFogoLoc = model.getAgPos(0);
+			Location bombFogoLoc = model.getAgPos(0);		
 			
+			System.out.println ("linha: " + bombFogoLoc.x + " coluna: " + bombFogoLoc.y);
 			
 			setAgPos(3, bombFogoLoc);
 							
