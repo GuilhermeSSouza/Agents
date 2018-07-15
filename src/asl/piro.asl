@@ -4,6 +4,6 @@
 	<- 	!mover.
 	
 +!mover : true
-	<- 	.wait (500);
+	<- 	.wait (800);
 		andaPiro.
 

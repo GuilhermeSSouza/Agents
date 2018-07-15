@@ -1,12 +1,23 @@
 // Agent walker in project graficTest
 
 +local(L, X, Y) : true
-	<- 	!mover (X, Y).
-	
+	<- 	!mover (X, Y)
+		.print ("ANDANDO CIVIL").
+		
++incendio (X) : true
+	<- .print("INCENDIO");
+	   .send(bomb, achieve, apaga).
+	   
+	   
+	   
++prendendo (X) : true
+	<- .print("PULICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+	.send(policia,achieve, pegaPi).
 
-+fogo(X) : true 
-	<-	.print ("CHAMANDO BOMBEIRO");
-		.send(bomb, achieve, apaga).
+
++pega (X) : true
+	<- .print("PULICAA");
+	   .send(policia, achieve, pegaPi).
 
 
 //+fogo(X) : true

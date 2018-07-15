@@ -6,7 +6,7 @@
 
 
 /* Initial goals*/ 
-+apaga[source(walker)] : true
++!apaga[source(walker)] : true
 	<- 	.print ("CHAMANDO OBJETIVO APAGAR FOGO");
 		!temFogo.
 		
@@ -17,10 +17,7 @@
 		apFogo.
 	
 	
-//+bombeiro(X) : true
-//	<- 	!mover.
 	
-//+!mover : true
-//	<- 	.wait (500);
-//		andaBomb.
-	
++!apaga [source(sellf)] : true.
+
++!temFogo : true.

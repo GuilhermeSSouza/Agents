@@ -24,15 +24,17 @@ public class AmbGraf extends Environment {
 	 * Crenças iniais dos agentes
 	 */
 	public static final Literal walker = Literal.parseLiteral("proximaCasa");
-	/*public static final Literal civilFogo = Literal.parseLiteral("apFogo");*/
+	/* public static final Literal civilFogo = Literal.parseLiteral("apFogo"); */
 	public static final Term piro = Literal.parseLiteral("andaPiro");
 	public static final Literal bomb = Literal.parseLiteral("apFogo");
-	
+	public static final Literal policia = Literal.parseLiteral("andaPolice");
 
 	private int contapiro = 0;
 	private int contaBomb = 0;
 	private int contaPoli = 0;
-	
+	public Location fogoLocal = new Location(0, 0);
+	public Location piroLocal = new Location(2, 5);
+
 	private Logger logger = Logger.getLogger("graficTest." + AmbGraf.class.getName());
 
 	private ModeloAmbGraf model;
@@ -60,16 +62,18 @@ public class AmbGraf extends Environment {
 		try {
 
 			if (action.equals(walker)) {
-				
+
 				model.proximaCasa();
-								
-			} else if (action.equals(piro)) {					
-				
+
+			} else if (action.equals(piro)) {
+
 				model.andaPiro();
-				
-			} else if (action.equals(bomb)){
-				
+
+			} else if (action.equals(bomb)) {
+
 				model.apFogo();
+			} else if (action.equals(policia)) {
+				model.andaPolice();
 			}
 
 		} catch (Exception e) {
@@ -87,34 +91,29 @@ public class AmbGraf extends Environment {
 		return true;
 	}
 
-	
-//	 /** Called before the end of MAS execution */
-//	 @Override
-//	 public void stop() {
-//	 super.stop();
-//	 }
+	@Override
+	public void stop() {
+		super.stop();
+	}
 
 	void updatePercepts() {
 		clearPercepts();
 
 		Location walkerLoc = model.getAgPos(0);
-		
-		
-		
 
 		Literal pos1 = Literal.parseLiteral("local(walker," + walkerLoc.x + "," + walkerLoc.y + ")");
-		Literal pos2 = Literal.parseLiteral("incendio(" + contapiro +")");
-		
-//				+ "piro," + piroLoc.x + "," + piroLoc.y + ")");
-		//Literal pos3 = Literal.parseLiteral("police(" + contaPoli + ")");
-		//Literal pos4 = Literal.parseLiteral("bombeiro("+ contaBomb + ")");
+		Literal pos2 = Literal.parseLiteral("incendio(" + contapiro + ")");
+		Literal pos3 = Literal.parseLiteral("prendendo(" + contaPoli + ")");
+
+		// + "piro," + piroLoc.x + "," + piroLoc.y + ")");
+		// Literal pos3 = Literal.parseLiteral("police(" + contaPoli + ")");
+		// Literal pos4 = Literal.parseLiteral("bombeiro("+ contaBomb + ")");
 
 		addPercept(pos1);
 		addPercept(pos2);
-		//addPercept(pos3);
-		//addPercept(pos4);
-		
-		
+		addPercept(pos3);
+		// addPercept(pos4);
+
 	}
 
 	class ModeloAmbGraf extends GridWorldModel {
@@ -123,25 +122,24 @@ public class AmbGraf extends Environment {
 			super(gridSize, gridSize, 4);
 
 			try {
-				setAgPos(0, 0, 0);
+				setAgPos(0, 1, 0);
 
 				Location piro = new Location(gridSize / 2, gridSize / 2);
 				Location pL = new Location(2, 5);
-				Location bomb = new Location (7,3);
+				Location bomb = new Location(0, 0);
 
 				setAgPos(1, piro);
-				
-				setAgPos(2,pL);
-				
+
+				setAgPos(2, pL);
+
 				setAgPos(3, bomb);
-				
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		void proximaCasa()  {
+		void proximaCasa() {
 
 			Location walkerLoc = getAgPos(0);
 
@@ -154,29 +152,48 @@ public class AmbGraf extends Environment {
 
 			if (walkerLoc.y == getHeight()) {
 				walkerLoc.x = 0;
-				walkerLoc.y=0;
+				walkerLoc.y = 0;
 			}
 
-			if(!model.hasObject(randFire, walkerLoc)){
-							
+			if (!hasObject(randFire, walkerLoc)) {
+
 				setAgPos(0, walkerLoc);
 				Literal novoWalker = Literal.parseLiteral("local(walker," + walkerLoc.x + "," + walkerLoc.y + ")");
+				System.out.println(novoWalker);
 				addPercept(novoWalker);
-			
-			}else {
-				clearPercepts();
-				contaBomb+=5;
-				System.out.println("\nBombeiro chamado\n");
+			} else {
 
 				
-				System.out.println("f(" + contaBomb + ")");
-			Literal fogo = Literal.parseLiteral("fogo(" + contaBomb + ")");
-			addPercept(fogo);
+				Literal fogo = Literal.parseLiteral("incendio(" + contaBomb + ")");
+				fogoLocal = walkerLoc;
+				addPercept(fogo);
+
 			}
-			
-			
-			
-			
+
+			System.out.print("AVISTADO");
+			Literal pegado = Literal.parseLiteral("prendendo(" + contaPoli + ")");
+			contaPoli++;
+			addPercept(pegado);
+			if (testPosi(getAgPos(0))) {
+				piroLocal = walkerLoc;
+
+			}
+
+		}
+
+		boolean testPosi(Location posi) {
+
+			Location piroLoc = getAgPos(1);
+			if (piroLoc.x == posi.x & piroLoc.y == posi.y) {
+
+				System.out.println("ESTÃO NO MESMO LUGAR");
+
+				return true;
+			}
+
+			System.out.println("ESTÂO EM LUGARES DIFERENTES");
+			return false;
+
 		}
 
 		void andaPiro() {
@@ -184,108 +201,125 @@ public class AmbGraf extends Environment {
 			Location pL = getAgPos(1);
 			int x = r.nextInt(10);
 			int y = r.nextInt(10);
-			
-			
-			if(pL.x<x) {
+
+			if (pL.x < x) {
 				pL.x++;
-			}else if (pL.x>x) {
+			} else if (pL.x > x) {
 				pL.x--;
 			}
-			
-			if(pL.y<y) {
+
+			if (pL.y < y) {
 				pL.y++;
-			}else if(pL.y>y) {
+			} else if (pL.y > y) {
 				pL.y--;
 			}
-			if(randFire <= r.nextInt(100)) {	
-				if(!model.hasObject(randFire, pL))
-				add (randFire, pL.x,pL.y);
-			}else {
-				
+			if (randFire <= r.nextInt(100)) {
+				if (!model.hasObject(randFire, pL)) {
+					add(randFire, pL.x, pL.y);
+				}
+			} else {
+
 			}
-			
-			
-			
+
 			setAgPos(1, pL);
-			contapiro ++;
-			Literal pos10 = Literal.parseLiteral("incendio(" + contapiro +")");
-			System.out.println ("\nPos2 = " + pos10 +"\n");
+			contapiro++;
+			Literal pos10 = Literal.parseLiteral("incendio(" + contapiro + ")");
+			System.out.println("\nPos2 = " + pos10 + "\n");
 			addPercept(pos10);
-			
+
 		}
-		
-		
+
 		/**
 		 * Ir ate onde o piro foi visto.
+		 * 
 		 * @param x
 		 * @param y
 		 */
-		void andaPolice(int x, int y) {
+		void andaPolice() throws Exception {
+
 			
 			Location poliLoc = getAgPos(2);
-			setAgPos(2,  new Location(x, poliLoc.y));
-			Location poliLoc2 = getAgPos(2);
-			setAgPos(2,  new Location(poliLoc2.x, y));
-			
+			if(hasObject(randFire, poliLoc)) {
+				
+
+				Literal fogo2 = Literal.parseLiteral("incendio(" + contaBomb + ")");
+				fogoLocal = poliLoc;
+				addPercept(fogo2);
+
+			}
+			setAgPos(2, piroLocal);
+			if (testPosi(getAgPos(2))) {
+
+				System.out.println("PEGUEI O SAFADO");
+				stop();
+			}
+
 		}
-		
-		
+
 		/**
 		 * Ir ate o incendio.
+		 * 
 		 * @param x
 		 * @param y
 		 */
-				
-		void apFogo() {			
+
+		void apFogo() {
+
 			
-			Location bombFogoLoc = model.getAgPos(0);		
+			try {
+				andaBomb();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
-			System.out.println ("linha: " + bombFogoLoc.x + " coluna: " + bombFogoLoc.y);
-			
-			setAgPos(3, bombFogoLoc);
-							
-			remove(randFire, bombFogoLoc);
-			
+
+			remove(randFire, fogoLocal);
+
+			proximaCasa();
+
 		}
-		
-		void andaBomb() {
-//			Random r = new Random();
-//			Location pL = getAgPos(3);
-//			int x = r.nextInt(10);
-//			int y = r.nextInt(10);
-//			if(pL.x<x) {
-//				pL.x++;
-//			}else if (pL.x>x) {
-//				pL.x--;
-//			}
-//			
-//			if(pL.y<y) {
-//				pL.y++;
-//			}else if(pL.y>y) {
-//				pL.y--;
-//			}
-//			if(randFire <= r.nextInt(100)) {
-//				if(!model.hasObject(randFire, pL))
-//				add (randFire, pL.x,pL.y);
-//			}else {}
-//			
-//			
-//			
-//			setAgPos(3, pL);
-//			contaBomb ++;
-//			Literal pos5 = Literal.parseLiteral("pos(" + contaBomb +")");
-//			System.out.println ("\nPos2 = " + pos5 +"\n");
-//			addPercept(pos5);
-//			
+
+		void andaBomb() throws InterruptedException {
+
+			setAgPos(3, fogoLocal);
 		}
-		
-		
-		
+
+	
+	
+	
+	    void andar(Location posi, int i) {
+
+			Location Loc = getAgPos(i);
+
+			Loc.x++;
+
+			if (Loc.x == getWidth()) {
+				Loc.x = 0;
+				Loc.y++;
+			}
+
+			if (Loc.y == getHeight()) {
+				Loc.x = 0;
+				Loc.y = 0;
+			}
+			
+			setAgPos(i, Loc);
+	    	
+	    	
+	    	
+	    	
+	    	
+	    	
+	    	
+	    	
+	    }
 	}
 
 	class VisaoAmbGraf extends GridWorldView implements Serializable {
 
 		static final long serialVersionUID = 10L;
+
 		public VisaoAmbGraf(ModeloAmbGraf model) {
 
 			super(model, "Mundo Andarilho", 1000);
@@ -317,7 +351,7 @@ public class AmbGraf extends Environment {
 
 		@Override
 		public void drawAgent(Graphics g, int x, int y, Color c, int id) {
-			
+
 			if (id == 0) {
 
 				String label = "Walker";
@@ -346,7 +380,7 @@ public class AmbGraf extends Environment {
 				super.drawString(g, x, y, defaultFont, label);
 				setVisible(true);
 			}
-			
+
 			if (id == 3) {
 
 				String label = "Bomb";
