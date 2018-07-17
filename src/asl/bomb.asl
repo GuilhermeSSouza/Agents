@@ -12,7 +12,7 @@
 		
 		
 +!temFogo:true
-	<- .wait(300);
+	<- .wait(500);
 		.print("APAGANDO INCENDIO !!!!!");
 		apFogo.
 	

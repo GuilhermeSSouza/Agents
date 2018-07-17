@@ -32,12 +32,12 @@
 	
 
 +!mover (X, Y) : X < 9
-	<- 	.wait (300);
+	<- 	.wait (1000);
 		proximaCasa.
 		
 
 +!mover (X, Y) : X == 9 & Y < 9
-	<- 	.wait (300);
+	<- 	.wait (1000);
 		proximaCasa.
 		
 

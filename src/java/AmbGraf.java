@@ -33,7 +33,7 @@ public class AmbGraf extends Environment {
 	private int contaBomb = 0;
 	private int contaPoli = 0;
 	public Location fogoLocal = new Location(0, 0);
-	public Location piroLocal = new Location(2, 5);
+	public Location piroLocal = new Location(2, 8);
 
 	private Logger logger = Logger.getLogger("graficTest." + AmbGraf.class.getName());
 
@@ -91,11 +91,20 @@ public class AmbGraf extends Environment {
 		return true;
 	}
 
+	
+	/**
+	 * Finaliza a simulação quando o policial captura o piro
+	 */
 	@Override
 	public void stop() {
 		super.stop();
 	}
 
+	
+	
+	/**
+	 * Iniciando as percepções dos agentes
+	 */
 	void updatePercepts() {
 		clearPercepts();
 
@@ -119,29 +128,39 @@ public class AmbGraf extends Environment {
 	class ModeloAmbGraf extends GridWorldModel {
 
 		public ModeloAmbGraf() {
-			super(gridSize, gridSize, 4);
+			
+			/**
+			 * Passamos o tamanho do ambiente e a quantidade maxima de agentes que existiram dentro dele
+			 */
+			super(gridSize, gridSize, 4);        
 
 			try {
-				setAgPos(0, 1, 0);
+				setAgPos(0, 1, 0);                                                          //Posição inical do civil ao inicar a simulação
 
-				Location piro = new Location(gridSize / 2, gridSize / 2);
-				Location pL = new Location(2, 5);
-				Location bomb = new Location(0, 0);
+				Location piro = new Location(gridSize / 2, gridSize / 2);                   //Localização inial do piro
+				Location pL = new Location(2, 8);											//Localização inicail do Policial
+				Location bomb = new Location(0, 0);											//Localização inicaial do Bomb
 
+				
+				/**
+				 * Colocando cada um deles dentro do gridWorld
+				 */
 				setAgPos(1, piro);
-
 				setAgPos(2, pL);
-
 				setAgPos(3, bomb);
-
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
+		
+		
+		/**
+		 * Método de movimentação do civil
+		 */
 		void proximaCasa() {
 
-			Location walkerLoc = getAgPos(0);
+			Location walkerLoc = getAgPos(0);												//obtem a posição do civil no grid
 
 			walkerLoc.x++;
 
@@ -154,9 +173,15 @@ public class AmbGraf extends Environment {
 				walkerLoc.x = 0;
 				walkerLoc.y = 0;
 			}
-
-			if (!hasObject(randFire, walkerLoc)) {
-
+			
+			
+			/**
+			 * Verifica se não tem fogo na proxima casa para onde o civil esta tentando ir:
+			 *  Se true -> Chama bombeiro, se tiver fogo (se false o !hasObject ele chama o bomb para o local)
+			 */
+			if (!hasObject(randFire, walkerLoc)) {                                        
+				
+																														//parametros para que o agente acredite na nova crença
 				setAgPos(0, walkerLoc);
 				Literal novoWalker = Literal.parseLiteral("local(walker," + walkerLoc.x + "," + walkerLoc.y + ")");
 				System.out.println(novoWalker);
@@ -180,7 +205,13 @@ public class AmbGraf extends Environment {
 			}
 
 		}
-
+		
+		
+		/**
+		 * Teste que verifica se existe mais de um agente na mesma casa; testa se o agente é um piro. Quem usa esse metodo é o civil, bomb e Policia.
+		 * @param posi
+		 * @return
+		 */
 		boolean testPosi(Location posi) {
 
 			Location piroLoc = getAgPos(1);
@@ -196,6 +227,10 @@ public class AmbGraf extends Environment {
 
 		}
 
+		
+		/**
+		 * Metodo de movimentação do piro, escolhe aleatoriamente a proxima casa a ir
+		 */
 		void andaPiro() {
 			Random r = new Random();
 			Location pL = getAgPos(1);
@@ -213,33 +248,38 @@ public class AmbGraf extends Environment {
 			} else if (pL.y > y) {
 				pL.y--;
 			}
-			if (randFire <= r.nextInt(100)) {
-				if (!model.hasObject(randFire, pL)) {
-					add(randFire, pL.x, pL.y);
+																	
+				
+				if (!model.hasObject(randFire, pL)) {							  //Se a casa já tiver fogo ele segue procurando outras casas para colocar fogo
+					if (randFire <= r.nextInt(100)) {                             //Testa se aquela casa ira ou não incediar            
+					add(randFire, getAgPos(1));									  //Add fogo,					
+					setAgPos(1, pL);											  // Vai para proxima casa sem fogo escolida
 				}
 			} else {
 
 			}
 
-			setAgPos(1, pL);
-			contapiro++;
+					/**
+					 * Passando dados para que o agente passe a acreditar na nova crença 															    
+					 */
+			contapiro++;            
 			Literal pos10 = Literal.parseLiteral("incendio(" + contapiro + ")");
 			System.out.println("\nPos2 = " + pos10 + "\n");
 			addPercept(pos10);
 
 		}
-
+ 
+		
+		
 		/**
-		 * Ir ate onde o piro foi visto.
-		 * 
-		 * @param x
-		 * @param y
+		 * O andaPolice é o conjunto de ações do policial, ele vai ate o local onde foi chamado
+		 * @throws Exception
 		 */
 		void andaPolice() throws Exception {
 
 			
 			Location poliLoc = getAgPos(2);
-			if(hasObject(randFire, poliLoc)) {
+			if(hasObject(randFire, poliLoc)) {                                             
 				
 
 				Literal fogo2 = Literal.parseLiteral("incendio(" + contaBomb + ")");
@@ -247,36 +287,34 @@ public class AmbGraf extends Environment {
 				addPercept(fogo2);
 
 			}
-			setAgPos(2, piroLocal);
-			if (testPosi(getAgPos(2))) {
-
-				System.out.println("PEGUEI O SAFADO");
-				stop();
+			andar(piroLocal, 2);                                                          //Recebe o local do chamado seja do civil, seja do bomb
+			if (testPosi(getAgPos(2))) {					
+				
+				System.out.println("PEGUEI O SAFADO");									 //Grito de euforia ao comprir seu trabalho! ;)
+				 
+				stop();																	 //Finaliza a aplicação
 			}
 
 		}
 
 		/**
-		 * Ir ate o incendio.
-		 * 
-		 * @param x
-		 * @param y
+		 * Apgar o incendio quando soliciado
 		 */
 
-		void apFogo() {
+		void apFogo() {		
+		
+			andar(fogoLocal, 3);	                                       //Anda ate o local
+			if (testPosi(getAgPos(2))) {								   // Teste se o piro foi visto ou não para chamar a policia
 
-			
-			try {
-				andaBomb();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				piroLocal = getAgPos(3);
 			}
 			
+			remove(randFire, fogoLocal);                                  //remove o fogo do local solicitado e do local onde está, caso o piro coloque fogo na casa
 
-			remove(randFire, fogoLocal);
-
+			
+			if(!hasObject(randFire, fogoLocal)) {                          //Diz ao civil que o fogo foi removido e ele pode andar
 			proximaCasa();
+			}                                                
 
 		}
 
@@ -288,29 +326,28 @@ public class AmbGraf extends Environment {
 	
 	
 	
+		
+		/**
+		 * Metodo generico que é usado pelo Bomb, e pelo Policia para se locomver pelo mundo
+		 * @param posi possição onde foi chamado, fogo ou piro avistado pelo civil ou pelo bomb
+		 * @param i, é o agent que ira relaizar a ação de se locomover
+		 */
 	    void andar(Location posi, int i) {
 
-			Location Loc = getAgPos(i);
+			Location Loc = getAgPos(i);                                                             //posição original de onde o agente está antes de se mover
+			Location LocLinha = new Location(posi.x, Loc.y);                                        //posição intermediaria dno caminho que ele ira percorrer.
 
-			Loc.x++;
-
-			if (Loc.x == getWidth()) {
-				Loc.x = 0;
-				Loc.y++;
-			}
-
-			if (Loc.y == getHeight()) {
-				Loc.x = 0;
-				Loc.y = 0;
-			}
+			setAgPos(i, LocLinha);                                                                  //ele se move até a possição intermediaria
 			
-			setAgPos(i, Loc);
-	    	
-	    	
-	    	
-	    	
-	    	
-	    	
+			try {
+				Thread.sleep(500);                                                                  // sem o sleep a ação ocorrer muito rapida, impossivél ver ele se movendo
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Loc = getAgPos(i);                                                                      //posição do agente apos primeiro movimento
+			LocLinha = new Location(Loc.x, posi.y);                                                 //posição final no grid
+			setAgPos(i, LocLinha);   	                                                            //chegando na possição onde foi chamado
 	    	
 	    	
 	    }
